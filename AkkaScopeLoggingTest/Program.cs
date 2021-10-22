@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Akka.Actor;
 using AkkaScopeLoggingTest.AkkaExtensions;
 using AkkaScopeLoggingTest.Examples;
@@ -50,7 +51,7 @@ namespace AkkaScopeLoggingTest
             _logger = _serviceProvider.GetRequiredService<ILogger<Program>>();
         }
 
-        private void Run()
+        private async Task Run()
         {
             _logger.LogInformation("Program running");
 
@@ -59,6 +60,10 @@ namespace AkkaScopeLoggingTest
             var testActor1 = actorSystem.ActorOf(Props.Create(() => new TestActorWithExtension()), "test-actor");
             testActor1.Tell(new Message(Guid.NewGuid().ToString(), "this is a test message"));
 
+            await Task.Delay(TimeSpan.FromSeconds(1));
+
+            testActor1.Tell(new Message(Guid.NewGuid().ToString(), "this is a second test message"));
+            
             Console.WriteLine("Hit enter to quit");
             Console.ReadLine();
         }
@@ -69,10 +74,10 @@ namespace AkkaScopeLoggingTest
             _serviceProvider.Dispose();
         }
 
-        static void Main()
+        static async Task Main()
         {
             using var program = new Program();
-            program.Run();
+            await program.Run();
         }
 
         
