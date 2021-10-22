@@ -25,11 +25,12 @@ namespace AkkaScopeLoggingTest.AkkaExtensions
         public MicrosoftAbstractionsExtensionProvider(IServiceProvider serviceProvider)
         {
             // Get the DI provided serilog logger, if available. This will be the case when 
-            // the serilog asp.net extensions have been configured as per instructions.
+            // the serilog asp.net extensions have been configured as per instructions 
+            // with `CreateBootstrapLogger()`. Refer to: https://github.com/serilog/serilog-aspnetcore 
             var baseSerilogLogger = serviceProvider.GetService<Serilog.ILogger>();
 
             // Fall back on the static global logger if the extensions have been configured
-            // using Microsoft's ILoggingBuilder.AddSerilog() instead.
+            // the simpler way using Microsoft's ILoggingBuilder.AddSerilog() instead.
             if (baseSerilogLogger == null)
             {
                 baseSerilogLogger = Serilog.Log.Logger;
