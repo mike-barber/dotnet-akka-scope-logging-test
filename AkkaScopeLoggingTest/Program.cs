@@ -43,7 +43,7 @@ namespace AkkaScopeLoggingTest
                 })
                 .AddSingleton<SomeService>()
                 .AddSingleton<IActorSystemService>(sp => new ActorSystemService(
-                    sp, 
+                    sp,
                     "my-actor-system"
                 ))
                 .BuildServiceProvider();
@@ -54,18 +54,26 @@ namespace AkkaScopeLoggingTest
         private async Task Run()
         {
             _logger.LogInformation("Program running");
+            _logger.LogWarning("Enter a message, or an empty line to quit.");
 
             var actorSystem = _serviceProvider.GetRequiredService<IActorSystemService>().ActorSystem;
-            
+
             var testActor1 = actorSystem.ActorOf(Props.Create(() => new TestActorWithExtension()), "test-actor");
             testActor1.Tell(new Message(Guid.NewGuid().ToString(), "this is a test message"));
 
             await Task.Delay(TimeSpan.FromSeconds(1));
 
             testActor1.Tell(new Message(Guid.NewGuid().ToString(), "this is a second test message"));
-            
-            Console.WriteLine("Hit enter to quit");
-            Console.ReadLine();
+
+            while (true)
+            {
+                var line = Console.ReadLine();
+                if (string.IsNullOrEmpty(line))
+                {
+                    break;
+                }
+                testActor1.Tell(new Message(Guid.NewGuid().ToString(), line));
+            }
         }
 
         public void Dispose()
@@ -80,6 +88,6 @@ namespace AkkaScopeLoggingTest
             await program.Run();
         }
 
-        
+
     }
 }
